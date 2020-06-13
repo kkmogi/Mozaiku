@@ -8,6 +8,8 @@ The valid format of the argument is as follows:
 python3 main.py [name of image] [type of edit] [(optioanl) additionanl arguments]
 ```
 
+```[name of image]``` is the file name of the image including the file name extention. Note that this image must be in a folder called ```img```.
+
 ```[type of edit]``` can be any one of ```pixelate, blur``` (more will be available).
 
 Additional arguments are optioanl as default values are set. 
@@ -16,3 +18,4 @@ If one would like to set this value, below are the details for each edit type.
     There is one additional argument, which is the number of pixels in the x-direction. This must be a positive integer.
 ```blur```:
     There is one additional argument, which is the radius used in blurring the image. This must be a positive integer. 
+
