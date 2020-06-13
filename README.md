@@ -16,10 +16,13 @@ python3 main.py [name of image] [type of edit] [(optioanl) additionanl arguments
 
 Additional arguments are optioanl as default values are set. 
 If one would like to set this value, below are the details for each edit type. 
-```pixelate```:
+
+```pixelate```
     There is one additional argument, which is the number of pixels in the x-direction. This must be a positive integer.
-```blur```:
+
+```blur```
     There is one additional argument, which is the radius used in blurring the image. This must be a positive integer. 
-```face_blur```:
+
+```face_blur```
     There is one additional argument, which is the radius used in blurring the image. This must be a positive integer. 
 
