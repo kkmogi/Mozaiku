@@ -10,7 +10,7 @@ To run the code, please download this, move to the appropriate directory, and ty
 python3 main.py [name of image] [type of edit] [(optioanl) additionanl arguments]
 ```
 
-```[name of image]``` is the file name of the image including the file name extention. Note that this image must be in a folder called ```img```.
+```[name of image]``` is the filename of the image including the extention. Note that this image must be in a folder called ```img```.
 
 ```[type of edit]``` can be any one of ```pixelate, blur, face_blur``` (more will be available).
 
