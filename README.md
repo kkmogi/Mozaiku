@@ -1,9 +1,10 @@
 # Mozaiku
 A simple Python code to edit images (in particular with the objective of reducing the amount of information in the image).
+The motivation behind this project is my personal hesitance to edit images using online tools as those often require the user to upload the image. 
 
 Please intall the required packes from requirements.txt. 
 
-The valid format of the argument is as follows:
+To run the code, please download this, move to the appropriate directory, and type in arguments to the command line in the following format: 
 ```
 python3 main.py [name of image] [type of edit] [(optioanl) additionanl arguments]
 ```
