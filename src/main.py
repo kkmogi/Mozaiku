@@ -3,6 +3,7 @@ import sys
 from utils import *
 from transformations import *
 
+
 def main():
 	image_name = sys.argv[1]
 	edit_type = sys.argv[2]
@@ -28,9 +29,17 @@ def main():
 		else:
 			new_image = gaussian_blur(image)
 
+	elif 'face_pixelate' == edit_type:
+		if var_list:
+			pixel_num_x = int(var_list[0])
+			new_image = face_pixelate(image, image_cv, pixel_num_x)
+		else:
+			new_image = face_pixelate(image, image_cv)
+
 	elif 'face_blur'.startswith(edit_type):
 		if var_list:
-			new_image = None
+			radius = int(var_list[0])
+			new_image = face_gaussian_blur(image, image_cv, radius)
 		else:
 			new_image = face_gaussian_blur(image, image_cv)
 
@@ -40,6 +49,7 @@ def main():
 
 	new_image.show()
 	save_image(new_image, image_name)
+
 
 if __name__ == '__main__':
 	main()

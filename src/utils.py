@@ -3,11 +3,13 @@ This file contains the implementations of helper functions.
 These functions are called in "main.py".
 """
 
+
 from PIL import Image, ExifTags
 import numpy as np
 import cv2
 import os
 import sys
+
 
 """
 Read the specified image and return it. 
@@ -36,6 +38,7 @@ def read_image(image_name, cv=False):
 		return image
 	except Exception as err:
 		print(err)
+
 
 """
 Save the edited image to 'img' folder under the name '[original_name] + _mzk'.
