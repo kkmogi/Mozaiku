@@ -5,7 +5,7 @@ The motivation behind this project is my personal hesitance to edit images using
 ### Using Mozaiku
 Please intall the required packeges from requirements.txt. 
 
-To run the code, please download this, move to the appropriate directory, and type in arguments to the command line in the following format: 
+To run the code, please download this, move to the appropriate directory, and type in the following argument to the command line: 
 ```
 python3 main.py [name of image] [type of edit] [(optioanl) additionanl arguments]
 ```
@@ -14,6 +14,7 @@ python3 main.py [name of image] [type of edit] [(optioanl) additionanl arguments
 
 ```[type of edit]``` can be any one of ```pixelate, blur, face_pixelate, face_blur``` (more will be available).
 
+### About (Optional) Additional Arguments
 Additional arguments are optioanl as default values are set. 
 If one would like to set this value, below are the details for each edit type. 
 
