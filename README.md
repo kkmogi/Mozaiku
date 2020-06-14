@@ -3,7 +3,7 @@ A simple Python code to edit images (in particular with the objective of reducin
 The motivation behind this project is my personal hesitance to edit images using online tools as those often require the user to upload the image. 
 
 ### Using Mozaiku
-Please intall the required packes from requirements.txt. 
+Please intall the required packeges from requirements.txt. 
 
 To run the code, please download this, move to the appropriate directory, and type in arguments to the command line in the following format: 
 ```
