@@ -12,7 +12,7 @@ python3 main.py [name of image] [type of edit] [(optioanl) additionanl arguments
 
 ```[name of image]``` is the filename of the image including the extention. Note that this image must be in a folder called ```img```.
 
-```[type of edit]``` can be any one of ```pixelate, blur, face_blur``` (more will be available).
+```[type of edit]``` can be any one of ```pixelate, blur, face_pixelate, face_blur``` (more will be available).
 
 Additional arguments are optioanl as default values are set. 
 If one would like to set this value, below are the details for each edit type. 
@@ -23,6 +23,9 @@ If one would like to set this value, below are the details for each edit type.
 ```blur```
     There is one additional argument, which is the radius used in blurring the image. This must be a positive integer. 
 
+```face_pixelate```
+    There is one additional argument, which is the number of pixels in the x-direction for faces. This must be a positive intger.
+    
 ```face_blur```
     There is one additional argument, which is the radius used in blurring the image. This must be a positive integer. 
 
