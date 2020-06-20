@@ -7,8 +7,13 @@ These functions are called in "main.py".
 from PIL import Image, ImageFile, ImageFilter
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
+from torchvision import models
+import torch
+import torchvision.transforms as T
 import os
 import sys
+from utils import cv2_to_pil
 
 
 """
@@ -63,3 +68,121 @@ def face_gaussian_blur(image, image_cv, radius=20):
 		new_image.paste(cropped_image, box)
 	return new_image
 
+
+"""
+
+"""
+def decode_segmap(image, foreground, nc=21):
+	label_colors = np.array([(0, 0, 0),  # 0=background
+							# 1=aeroplane, 2=bicycle, 3=bird, 4=boat, 5=bottle
+							(128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128), (128, 0, 128),
+							# 6=bus, 7=car, 8=cat, 9=chair, 10=cow
+							(0, 128, 128), (128, 128, 128), (64, 0, 0), (192, 0, 0), (64, 128, 0),
+							# 11=dining table, 12=dog, 13=horse, 14=motorbike, 15=person
+							(192, 128, 0), (64, 0, 128), (192, 0, 128), (64, 128, 128), (192, 128, 128),
+							# 16=potted plant, 17=sheep, 18=sofa, 19=train, 20=tv/monitor
+							(0, 64, 0), (128, 64, 0), (0, 192, 0), (128, 192, 0), (0, 64, 128)])
+	r = np.zeros_like(image).astype(np.uint8)
+	g = np.zeros_like(image).astype(np.uint8)
+	b = np.zeros_like(image).astype(np.uint8)
+	for l in range(0, nc):
+		idx = image == l
+		r[idx] = label_colors[l, 0]
+		g[idx] = label_colors[l, 1]
+		b[idx] = label_colors[l, 2]
+	rgb = np.stack([r, g, b], axis=2)
+
+	foreground = cv2.cvtColor(foreground, cv2.COLOR_BGR2RGB)
+	foreground = cv2.resize(foreground,(r.shape[1],r.shape[0]))
+	background = 255 * np.ones_like(rgb).astype(np.uint8)
+	foreground = foreground.astype(float)
+	background = background.astype(float)
+	th, alpha = cv2.threshold(np.array(rgb),0,255, cv2.THRESH_BINARY)
+	alpha = cv2.GaussianBlur(alpha, (7,7),0)
+	alpha = alpha.astype(float)/255
+	foreground = cv2.multiply(alpha, foreground)
+	background = cv2.multiply(1.0 - alpha, background)
+	outImage = cv2.add(foreground, background)
+	return outImage, alpha*255
+
+
+"""
+Function to execute 'foreground_pixelate' transformation.
+"""
+def foreground_pixelate(image, image_cv, pixel_num_x=64):
+	net = models.segmentation.deeplabv3_resnet101(pretrained=1).eval()
+	trf = T.Compose([T.Resize(640), 
+					#T.CenterCrop(224), 
+					T.ToTensor(), 
+					T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])])
+	inp = trf(image.convert('RGB')).unsqueeze(0)
+	out = net(inp)['out']
+	om = torch.argmax(out.squeeze(), dim=0).detach().cpu().numpy()
+	foreground, alpha = decode_segmap(om, image_cv)
+	foreground, alpha = Image.fromarray(np.uint8(foreground)), Image.fromarray(np.uint8(alpha))
+	#print(image.size, foreground.size, alpha.size)
+	alpha.show()
+	image_copy = image.copy()
+	image = pixelate(image, pixel_num_x)
+	new_image = Image.composite(image, image_copy, alpha.resize(image.size, Image.NEAREST).convert('L'))
+	return new_image
+
+
+"""
+Function to execute 'foreground_blur' transformation. 
+"""
+def foreground_blur(image, image_cv, radius=20):
+	net = models.segmentation.deeplabv3_resnet101(pretrained=1).eval()
+	trf = T.Compose([T.Resize(640), 
+					#T.CenterCrop(224), 
+					T.ToTensor(), 
+					T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])])
+	inp = trf(image.convert('RGB')).unsqueeze(0)
+	out = net(inp)['out']
+	om = torch.argmax(out.squeeze(), dim=0).detach().cpu().numpy()
+	foreground, alpha = decode_segmap(om, image_cv)
+	foreground, alpha = Image.fromarray(np.uint8(foreground)), Image.fromarray(np.uint8(alpha))
+	#print(image.size, foreground.size, alpha.size)
+	alpha.show()
+	image_copy = image.copy()
+	image = gaussian_blur(image, radius)
+	new_image = Image.composite(image, image_copy, alpha.resize(image.size, Image.NEAREST).convert('L'))
+	return new_image
+
+
+def background_pixelate(image, image_cv, pixel_num_x=64):
+	net = models.segmentation.deeplabv3_resnet101(pretrained=1).eval()
+	trf = T.Compose([T.Resize(640), 
+					#T.CenterCrop(224), 
+					T.ToTensor(), 
+					T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])])
+	inp = trf(image.convert('RGB')).unsqueeze(0)
+	out = net(inp)['out']
+	om = torch.argmax(out.squeeze(), dim=0).detach().cpu().numpy()
+	foreground, alpha = decode_segmap(om, image_cv)
+	foreground, alpha = Image.fromarray(np.uint8(foreground)), Image.fromarray(np.uint8(alpha))
+	#print(image.size, foreground.size, alpha.size)
+	alpha.show()
+	image_copy = image.copy()
+	image = pixelate(image, pixel_num_x)
+	new_image = Image.composite(image_copy, image, alpha.resize(image.size, Image.NEAREST).convert('L'))
+	return new_image
+
+
+def background_blur(image, image_cv, radius=20):
+	net = models.segmentation.deeplabv3_resnet101(pretrained=1).eval()
+	trf = T.Compose([T.Resize(640), 
+					#T.CenterCrop(224), 
+					T.ToTensor(), 
+					T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])])
+	inp = trf(image.convert('RGB')).unsqueeze(0)
+	out = net(inp)['out']
+	om = torch.argmax(out.squeeze(), dim=0).detach().cpu().numpy()
+	foreground, alpha = decode_segmap(om, image_cv)
+	foreground, alpha = Image.fromarray(np.uint8(foreground)), Image.fromarray(np.uint8(alpha))
+	#print(image.size, foreground.size, alpha.size)
+	alpha.show()
+	image_copy = image.copy()
+	image = gaussian_blur(image, radius)
+	new_image = Image.composite(image_copy, image, alpha.resize(image.size, Image.NEAREST).convert('L'))
+	return new_image

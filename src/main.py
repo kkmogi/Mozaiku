@@ -3,7 +3,6 @@ import sys
 from utils import *
 from transformations import *
 
-
 def main():
 	image_name = sys.argv[1]
 	edit_type = sys.argv[2]
@@ -12,7 +11,7 @@ def main():
 		var_list = sys.argv[3:len(sys.argv)]
 
 	image = read_image(image_name)
-	if edit_type.startswith('face'):
+	if edit_type.startswith('f') or edit_type.startswith('background'):
 		image_cv = read_image(image_name, True)
 
 	if 'pixelate'.startswith(edit_type):
@@ -42,6 +41,18 @@ def main():
 			new_image = face_gaussian_blur(image, image_cv, radius)
 		else:
 			new_image = face_gaussian_blur(image, image_cv)
+
+	elif 'foreground_pixelate' == edit_type:
+		new_image = foreground_pixelate(image, image_cv)
+
+	elif 'foreground_blur' == edit_type:
+		new_image = foreground_blur(image, image_cv)
+
+	elif 'background_pixelate' == edit_type:
+		new_image = background_pixelate(image, image_cv)
+
+	elif 'background_blur' == edit_type:
+		new_image = background_blur(image, image_cv)
 
 	else:
 		print('Invalid argument.')

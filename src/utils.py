@@ -49,3 +49,10 @@ def save_image(new_image, image_name):
 	new_image_path = os.path.join(root_dir, 'img', new_image_name)
 	new_image.save(new_image_path)
 
+
+"""
+Convert cv2 image to pillow image 
+"""
+def cv2_to_pil(cv2_image):
+	pil_image=Image.fromarray(cv2.cvtColor(cv2_image, cv2.COLOR_BGR2RGB))
+	return pil_image
