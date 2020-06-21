@@ -1,6 +1,5 @@
 # Mozaiku
-A simple Python code to edit images (in particular with the objective of reducing the amount of information in the image).
-The motivation behind this project is my personal hesitance to edit images using online tools as those often require the user to upload the image. 
+A simple Python code to edit images (in particular with the objective of reducing the amount of information in the image). It can pixelate/blur an entire image or particular parts of an image (e.g. face, foreground, background). The motivation behind this project is my personal hesitance to edit images using online tools as those often require the user to upload the image. 
 
 ### Using Mozaiku
 Please intall the required packeges from requirements.txt. 
@@ -10,7 +9,7 @@ To run the code, please download this, move to the appropriate directory, instal
 python3 main.py [name of image] [type of edit] [(optioanl) additionanl arguments]
 ```
 
-```[name of image]``` is the filename of the image including the extention. Note that this image must be in a folder called ```img```.
+```[name of image]``` is the filename of the image including the extention. Note that this image must be in a folder called ```img``` and be in either ```.jpg``` or ```.png``` format. 
 
 ```[type of edit]``` can be any one of ```pixelate, blur, face_pixelate, face_blur, foreground_pixelate, background_pixelate, foreground_blur, background_blur``` (more will be available).
 
