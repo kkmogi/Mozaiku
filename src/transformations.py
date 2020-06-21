@@ -70,9 +70,9 @@ def face_gaussian_blur(image, image_cv, radius=20):
 
 
 """
-
+Function to extract alpha channel from an image. 
 """
-def decode_segmap(image, foreground, nc=21):
+def extract_alpha(image, foreground, nc=21):
 	label_colors = np.array([(0, 0, 0),  # 0=background
 							# 1=aeroplane, 2=bicycle, 3=bird, 4=boat, 5=bottle
 							(128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128), (128, 0, 128),
@@ -102,14 +102,11 @@ def decode_segmap(image, foreground, nc=21):
 	alpha = alpha.astype(float)/255
 	foreground = cv2.multiply(alpha, foreground)
 	background = cv2.multiply(1.0 - alpha, background)
-	outImage = cv2.add(foreground, background)
-	return outImage, alpha*255
+	new_image = cv2.add(foreground, background)
+	return new_image, alpha*255
 
 
-"""
-Function to execute 'foreground_pixelate' transformation.
-"""
-def foreground_pixelate(image, image_cv, pixel_num_x=64):
+def separate_foreground_background(image, image_cv, var, edit_type):
 	net = models.segmentation.deeplabv3_resnet101(pretrained=1).eval()
 	trf = T.Compose([T.Resize(640), 
 					#T.CenterCrop(224), 
@@ -118,13 +115,32 @@ def foreground_pixelate(image, image_cv, pixel_num_x=64):
 	inp = trf(image.convert('RGB')).unsqueeze(0)
 	out = net(inp)['out']
 	om = torch.argmax(out.squeeze(), dim=0).detach().cpu().numpy()
-	foreground, alpha = decode_segmap(om, image_cv)
+	foreground, alpha = extract_alpha(om, image_cv)
 	foreground, alpha = Image.fromarray(np.uint8(foreground)), Image.fromarray(np.uint8(alpha))
-	#print(image.size, foreground.size, alpha.size)
-	alpha.show()
 	image_copy = image.copy()
-	image = pixelate(image, pixel_num_x)
-	new_image = Image.composite(image, image_copy, alpha.resize(image.size, Image.NEAREST).convert('L'))
+	if edit_type == 'foreground_pixelate':
+		image = pixelate(image, var)
+		new_image = Image.composite(image, image_copy, alpha.resize(image.size, Image.NEAREST).convert('L'))
+	elif edit_type == 'foreground_blur':
+		image = gaussian_blur(image, var)
+		new_image = Image.composite(image, image_copy, alpha.resize(image.size, Image.NEAREST).convert('L'))
+	elif edit_type == 'background_pixelate':
+		image = pixelate(image, var)
+		new_image = Image.composite(image_copy, image, alpha.resize(image.size, Image.NEAREST).convert('L'))
+	elif edit_type == 'background_blur':
+		image = gaussian_blur(image, var)
+		new_image = Image.composite(image_copy, image, alpha.resize(image.size, Image.NEAREST).convert('L'))
+	else:
+		print('An error occured in separate_foreground_background')
+		return
+	return new_image
+
+
+"""
+Function to execute 'foreground_pixelate' transformation.
+"""
+def foreground_pixelate(image, image_cv, pixel_num_x=64):
+	new_image = separate_foreground_background(image, image_cv, pixel_num_x, 'foreground_pixelate')
 	return new_image
 
 
@@ -132,57 +148,21 @@ def foreground_pixelate(image, image_cv, pixel_num_x=64):
 Function to execute 'foreground_blur' transformation. 
 """
 def foreground_blur(image, image_cv, radius=20):
-	net = models.segmentation.deeplabv3_resnet101(pretrained=1).eval()
-	trf = T.Compose([T.Resize(640), 
-					#T.CenterCrop(224), 
-					T.ToTensor(), 
-					T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])])
-	inp = trf(image.convert('RGB')).unsqueeze(0)
-	out = net(inp)['out']
-	om = torch.argmax(out.squeeze(), dim=0).detach().cpu().numpy()
-	foreground, alpha = decode_segmap(om, image_cv)
-	foreground, alpha = Image.fromarray(np.uint8(foreground)), Image.fromarray(np.uint8(alpha))
-	#print(image.size, foreground.size, alpha.size)
-	alpha.show()
-	image_copy = image.copy()
-	image = gaussian_blur(image, radius)
-	new_image = Image.composite(image, image_copy, alpha.resize(image.size, Image.NEAREST).convert('L'))
+	new_image = separate_foreground_background(image, image_cv, radius, 'foreground_blur')
 	return new_image
 
 
+"""
+Function to execute 'background_pixelate' transformation. 
+"""
 def background_pixelate(image, image_cv, pixel_num_x=64):
-	net = models.segmentation.deeplabv3_resnet101(pretrained=1).eval()
-	trf = T.Compose([T.Resize(640), 
-					#T.CenterCrop(224), 
-					T.ToTensor(), 
-					T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])])
-	inp = trf(image.convert('RGB')).unsqueeze(0)
-	out = net(inp)['out']
-	om = torch.argmax(out.squeeze(), dim=0).detach().cpu().numpy()
-	foreground, alpha = decode_segmap(om, image_cv)
-	foreground, alpha = Image.fromarray(np.uint8(foreground)), Image.fromarray(np.uint8(alpha))
-	#print(image.size, foreground.size, alpha.size)
-	alpha.show()
-	image_copy = image.copy()
-	image = pixelate(image, pixel_num_x)
-	new_image = Image.composite(image_copy, image, alpha.resize(image.size, Image.NEAREST).convert('L'))
+	new_image = separate_foreground_background(image, image_cv, pixel_num_x, 'background_pixelate')
 	return new_image
 
 
+"""
+Function to execute 'background_blur' transformation. 
+"""
 def background_blur(image, image_cv, radius=20):
-	net = models.segmentation.deeplabv3_resnet101(pretrained=1).eval()
-	trf = T.Compose([T.Resize(640), 
-					#T.CenterCrop(224), 
-					T.ToTensor(), 
-					T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])])
-	inp = trf(image.convert('RGB')).unsqueeze(0)
-	out = net(inp)['out']
-	om = torch.argmax(out.squeeze(), dim=0).detach().cpu().numpy()
-	foreground, alpha = decode_segmap(om, image_cv)
-	foreground, alpha = Image.fromarray(np.uint8(foreground)), Image.fromarray(np.uint8(alpha))
-	#print(image.size, foreground.size, alpha.size)
-	alpha.show()
-	image_copy = image.copy()
-	image = gaussian_blur(image, radius)
-	new_image = Image.composite(image_copy, image, alpha.resize(image.size, Image.NEAREST).convert('L'))
+	new_image = separate_foreground_background(image, image_cv, radius, 'background_blur')
 	return new_image
