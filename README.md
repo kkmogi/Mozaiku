@@ -5,14 +5,16 @@ The motivation behind this project is my personal hesitance to edit images using
 ### Using Mozaiku
 Please intall the required packeges from requirements.txt. 
 
-To run the code, please download this, move to the appropriate directory, and type in the following argument to the command line: 
+To run the code, please download this, move to the appropriate directory, install required libraries listed in ```requirements.txt```, and type in the following argument to the command line: 
 ```
 python3 main.py [name of image] [type of edit] [(optioanl) additionanl arguments]
 ```
 
 ```[name of image]``` is the filename of the image including the extention. Note that this image must be in a folder called ```img```.
 
-```[type of edit]``` can be any one of ```pixelate, blur, face_pixelate, face_blur, foreground_pixelate, background_pixelate. foreground_blur, background_blur``` (more will be available).
+```[type of edit]``` can be any one of ```pixelate, blur, face_pixelate, face_blur, foreground_pixelate, background_pixelate, foreground_blur, background_blur``` (more will be available).
+
+Note that anything with ```foreground/background``` takes a few seconds to run. 
 
 ### About (Optional) Additional Arguments
 Additional arguments are optioanl as default values are set. 
