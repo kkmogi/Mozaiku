@@ -13,6 +13,9 @@ python3 main.py [name of image] [type of edit] [(optioanl) additionanl arguments
 
 Note that anything with ```foreground/background``` takes a few seconds to run. 
 
+### Examples
+An example of each edit can be found in the ```img``` folder.
+
 ### About (Optional) Additional Arguments
 Additional arguments are optioanl as default values are set. 
 If one would like to set this value, below are the details for each edit type. 
