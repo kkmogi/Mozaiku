@@ -3,7 +3,6 @@ This file contains the implementations of the various transformations.
 These functions are called in "main.py".
 """
 
-
 from PIL import Image, ImageFile, ImageFilter
 import numpy as np
 import cv2
@@ -15,7 +14,6 @@ import os
 import sys
 from utils import cv2_to_pil
 
-
 """
 Function to execute 'pixelate' transformation.
 """
@@ -26,14 +24,12 @@ def pixelate(image, pixel_num_x=64):
 	new_image = small_image.resize(image.size, Image.NEAREST)
 	return new_image
 
-
 """
 Function to execute 'blur' transformation.
 """
 def gaussian_blur(image, radius=20):
 	new_image = image.filter(ImageFilter.BoxBlur(radius))
 	return new_image
-
 
 """
 Function to execute 'face_pixelate' transformation.
@@ -52,7 +48,6 @@ def face_pixelate(image, image_cv, pixel_num_x=8):
 		new_image.paste(new_cropped_image, box)
 	return new_image
 
-
 """
 Function to execute 'face_blur' transformation. 
 """
@@ -67,7 +62,6 @@ def face_gaussian_blur(image, image_cv, radius=20):
 		cropped_image = cropped_image.filter(ImageFilter.BoxBlur(radius))
 		new_image.paste(cropped_image, box)
 	return new_image
-
 
 """
 Function to extract alpha channel from an image. 
@@ -105,7 +99,6 @@ def extract_alpha(image, foreground, nc=21):
 	new_image = cv2.add(foreground, background)
 	return new_image, alpha*255
 
-
 def separate_foreground_background(image, image_cv, var, edit_type):
 	net = models.segmentation.deeplabv3_resnet101(pretrained=1).eval()
 	trf = T.Compose([T.Resize(640), 
@@ -135,14 +128,12 @@ def separate_foreground_background(image, image_cv, var, edit_type):
 		return
 	return new_image
 
-
 """
 Function to execute 'foreground_pixelate' transformation.
 """
 def foreground_pixelate(image, image_cv, pixel_num_x=64):
 	new_image = separate_foreground_background(image, image_cv, pixel_num_x, 'foreground_pixelate')
 	return new_image
-
 
 """
 Function to execute 'foreground_blur' transformation. 
@@ -151,14 +142,12 @@ def foreground_blur(image, image_cv, radius=20):
 	new_image = separate_foreground_background(image, image_cv, radius, 'foreground_blur')
 	return new_image
 
-
 """
 Function to execute 'background_pixelate' transformation. 
 """
 def background_pixelate(image, image_cv, pixel_num_x=64):
 	new_image = separate_foreground_background(image, image_cv, pixel_num_x, 'background_pixelate')
 	return new_image
-
 
 """
 Function to execute 'background_blur' transformation. 

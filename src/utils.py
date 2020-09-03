@@ -3,13 +3,10 @@ This file contains the implementations of helper functions.
 These functions are called in "main.py".
 """
 
-
 from PIL import Image, ExifTags
 import numpy as np
 import cv2
 import os
-import sys
-
 
 """
 Read the specified image and return it. 
@@ -39,7 +36,6 @@ def read_image(image_name, cv=False):
 	except Exception as err:
 		print(err)
 
-
 """
 Save the edited image to 'img' folder under the name '[original_name] + _mzk'.
 """
@@ -48,7 +44,6 @@ def save_image(new_image, image_name):
 	new_image_name = image_name.split('.')[0] + '_mzk.' + image_name.split('.')[1]
 	new_image_path = os.path.join(root_dir, 'img', new_image_name)
 	new_image.save(new_image_path)
-
 
 """
 Convert cv2 image to pillow image 
